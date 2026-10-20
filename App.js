@@ -1,20 +1,31 @@
+import React, { useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { store } from './src/store';
+import RootNavigator from './src/navigation/RootNavigator';
+import Loading from './src/components/Loading';
+import useAuth from './src/hooks/useAuth';
+
+function Root() {
+  const { initializing, restoreSession } = useAuth();
+
+  // Auto-login khi mở app
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
+
+  if (initializing) return <Loading />;
+  return <RootNavigator />;
+}
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <Root />
+      </SafeAreaProvider>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
